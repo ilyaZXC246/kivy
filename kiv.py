@@ -6,7 +6,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 
 
-PASSWORD = '1'
+PASSWORD = 'арина бомж слуга ильи'
 
 
 class Applick(App):
@@ -15,6 +15,8 @@ class Applick(App):
     title = 'Приложение'
 
     def build(self):
+        """строитель"""
+
         self.sm = ScreenManager()
         self.main_screen = MainScreen(name='main_screen')
         self.left_screen = ChildScreen(name='left_screen', text='левый экран')
