@@ -1,3 +1,6 @@
+import os
+os.environ['KIVY_NO_CONSOLELOG'] = 'hide'
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
