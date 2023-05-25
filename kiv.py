@@ -1,5 +1,5 @@
-import os
-os.environ['KIVY_NO_CONSOLELOG'] = 'hide'
+# import os
+# os.environ['KIVY_NO_CONSOLELOG'] = 'hide'
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -9,7 +9,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 
 
-PASSWORD = 'арина бомж слуга ильи'
+PASSWORD = '1'
 
 
 class Applick(App):
