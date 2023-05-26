@@ -6,6 +6,7 @@ from kivy.graphics import *
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.slider import Slider
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
@@ -13,7 +14,8 @@ from random import randint as rand
 
 
 PASSWORD = '1'
-points = []
+RAD = 20
+r, g, b = 0, 0, 0
 
 
 class Applick(App):
@@ -26,14 +28,14 @@ class Applick(App):
 
         self.sm = ScreenManager()
         self.main_screen = MainScreen(name='main_screen')
-        # self.left_screen = ChildScreen(name='left_screen', text='левый экран')
+        self.draw_screen = DrawScreen(name='draw_screen')
         self.points_screen = PointsScreen(name='points_screen')
         # self.right_screen = ChildScreen(name='right_screen', text='правый экран')
         # self.down_screen = ChildScreen(name='down_screen', text='нижний экран')
         self.protected_screen = ProtectedScreen(name='protected_screen')
 
         self.sm.add_widget(self.main_screen)
-        # self.sm.add_widget(self.left_screen)
+        self.sm.add_widget(self.draw_screen)
         self.sm.add_widget(self.points_screen)
         # self.sm.add_widget(self.right_screen)
         # self.sm.add_widget(self.down_screen)
@@ -49,9 +51,9 @@ class MainScreen(Screen):
         super().__init__(**kwargs)
 
         self.main_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
-        self.main_layout.btn_up = NavButton(nav='up_screen', size_hint=(.35, .5), text='Вверх')
+        self.main_layout.btn_up = NavButton(nav='points_screen', size_hint=(.35, .5), text='Вверх')
         self.main_layout.layout = BoxLayout(orientation='horizontal', padding=8, spacing=8, size_hint=(1, .5))
-        self.main_layout.layout.btn_left = NavButton(nav='left_screen', text='Влево')
+        self.main_layout.layout.btn_left = NavButton(nav='draw_screen', text='Влево')
         self.main_layout.layout.btn_right = NavButton(nav='right_screen', text='Вправо')
         self.main_layout.layout.text = Label(text='Выбери')
         self.main_layout.btn_down = NavButton(nav='down_screen', size_hint=(.35, .5), text='Вниз')
@@ -80,15 +82,45 @@ class PointsScreen(Screen):
         self.main_layout.layout = BoxLayout(orientation='horizontal', size_hint=(1, None))
         self.main_layout.layout.plus100_btn = PlusButton(pl=100, text='+100')
         self.main_layout.layout.plus500_btn = PlusButton(pl=500, text='+500')
-        self.main_layout.layout.reset_btn = ResetButton(text='reset')
-        self.main_layout.layout.back_btn = NavButton(nav='main_screen', text='Назад', clear=True)
+        self.main_layout.layout.reset_btn = ResetButton(canv=self.main_layout.can, text='reset')
+        self.main_layout.layout.count = Label(text='0')
+        self.main_layout.layout.back_btn = NavButton(nav='main_screen', text='Назад', clear=True, canv=self.main_layout.can)
 
         self.main_layout.add_widget(self.main_layout.can)
         self.main_layout.layout.add_widget(self.main_layout.layout.plus100_btn)
         self.main_layout.layout.add_widget(self.main_layout.layout.plus500_btn)
         self.main_layout.layout.add_widget(self.main_layout.layout.reset_btn)
+        self.main_layout.layout.add_widget(self.main_layout.layout.count)
         self.main_layout.layout.add_widget(self.main_layout.layout.back_btn)
         self.main_layout.add_widget(self.main_layout.layout)
+        self.add_widget(self.main_layout)
+
+
+class DrawScreen(Screen):
+    """Рисовашкка"""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.main_layout = BoxLayout(orientation='vertical')
+        self.main_layout.can = Drawcanvas()
+        self.main_layout.layout = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        self.main_layout.layout.color_layout = BoxLayout(orientation='vertical')
+        self.main_layout.layout.color_layout.red_slider = ColorSlider(color='red', min=0, max=255, value_track=True, value_track_color=[1, 0, 0, 1])
+        self.main_layout.layout.color_layout.green_slider = ColorSlider(color='green', min=0, max=255, value_track=True, value_track_color=[0, 1, 0, 1])
+        self.main_layout.layout.color_layout.blue_slider = ColorSlider(color='blue', min=0, max=255, value_track=True, value_track_color=[0, 0, 1, 1])
+        self.main_layout.layout.col = Label(size_hint=(.3, 1))
+        self.main_layout.layout.reset_btn = ResetButton(canv=self.main_layout.can, text='Стереть', size_hint=(.4, 1))
+        self.main_layout.layout.back_btn = NavButton(text='назад', nav='main_screen', size_hint=(.4, 1), clear=True, canv=self.main_layout.can)
+
+        self.main_layout.add_widget(self.main_layout.can)
+        self.main_layout.add_widget(self.main_layout.layout)
+        self.main_layout.layout.color_layout.add_widget(self.main_layout.layout.color_layout.red_slider)
+        self.main_layout.layout.color_layout.add_widget(self.main_layout.layout.color_layout.green_slider)
+        self.main_layout.layout.color_layout.add_widget(self.main_layout.layout.color_layout.blue_slider)
+        self.main_layout.layout.add_widget(self.main_layout.layout.color_layout)
+        self.main_layout.layout.add_widget(self.main_layout.layout.col)
+        self.main_layout.layout.add_widget(self.main_layout.layout.reset_btn)
+        self.main_layout.layout.add_widget(self.main_layout.layout.back_btn)
         self.add_widget(self.main_layout)
 
 
@@ -122,19 +154,30 @@ class ProtectedScreen(Screen):
 class NavButton(Button):
     """Навигационные кнопки"""
 
-    def __init__(self, nav, clear=False, **kwargs):
+    def __init__(self, nav, clear=False, canv=None, **kwargs):
         super().__init__(**kwargs)
         self.nav = nav
+        self.canv = canv
         self.clear = clear
         self.on_press = self.next
 
     def next(self):
         """Переключает экран при нажатии"""
 
+        global r, g, b
         if self.clear:
-            app.points_screen.main_layout.can.canvas.clear()
 
-        if self.nav == 'up_screen':
+            self.canv.canvas.clear()
+            app.points_screen.main_layout.layout.count.text = '0'
+            app.draw_screen.main_layout.layout.color_layout.red_slider.value = 0
+            app.draw_screen.main_layout.layout.color_layout.green_slider.value = 0
+            app.draw_screen.main_layout.layout.color_layout.blue_slider.value = 0
+            r, g, b = 0, 0, 0
+            with app.draw_screen.main_layout.layout.col.canvas:
+                Color(0, 0, 0, 1)
+                Rectangle(pos=app.draw_screen.main_layout.layout.col.pos, size=app.draw_screen.main_layout.layout.col.size)
+
+        if self.nav == 'points_screen':
             app.position = 'up'
             app.main_screen.manager.transition.direction = 'down'
             app.main_screen.manager.current = 'protected_screen'
@@ -144,7 +187,7 @@ class NavButton(Button):
             app.main_screen.manager.transition.direction = 'up'
             app.main_screen.manager.current = 'protected_screen'
 
-        if self.nav == 'left_screen':
+        if self.nav == 'draw_screen':
             app.position = 'left'
             app.main_screen.manager.transition.direction = 'right'
             app.main_screen.manager.current = 'protected_screen'
@@ -163,7 +206,7 @@ class NavButton(Button):
 
         if self.nav == 'apply':
 
-            if app.protected_screen.main_layout.text_input.text == PASSWORD:
+            if app.protected_screen.main_layout.text_input.text.lower() == PASSWORD.lower():
 
                 if app.position == 'up':
                     app.main_screen.manager.current = 'points_screen'
@@ -172,7 +215,7 @@ class NavButton(Button):
                     pass
 
                 elif app.position == 'left':
-                    pass
+                    app.main_screen.manager.current = 'draw_screen'
 
                 elif app.position == 'right':
                     pass
@@ -191,8 +234,11 @@ class PlusButton(Button):
         self.on_press = self.plus_points
 
     def plus_points(self):
-        """Добавление"""
+        """Добавление точек"""
+
         with app.points_screen.main_layout.can.canvas:
+            app.points_screen.main_layout.layout.count.text = str(
+                int(app.points_screen.main_layout.layout.count.text) + self.pl)
             for i in range(self.pl):
                 R, G, B, A = rand(0, 255) / 256, rand(0, 255) / 256, rand(0, 255) / 256, 1
                 Color(R, G, B, A)
@@ -200,16 +246,71 @@ class PlusButton(Button):
 
 
 class ResetButton(Button):
-    """КНОПКА УБИРАЕТ ВСЕ ТОЧКИ"""
+    """очищает холст"""
 
-    def __init__(self, **kwargs):
+    def __init__(self, canv, **kwargs):
         super().__init__(**kwargs)
         self.on_press = self.reset
+        self.canv = canv
 
-    @staticmethod
-    def reset():
+    def reset(self):
         """очистка холста"""
-        app.points_screen.main_layout.can.canvas.clear()
+        self.canv.canvas.clear()
+        app.points_screen.main_layout.layout.count.text = '0'
+
+
+class ColorSlider(Slider):
+    """Слайдеры цвета"""
+
+    def __init__(self, color, **kwargs):
+        global r, g, b
+        super().__init__(**kwargs)
+        self.color = color
+
+        if color == 'red':
+            r = self.value
+
+        if color == 'green':
+            g = self.value
+
+        if color == 'blue':
+            b = self.value
+
+        self.bind(value=self.change)
+
+    def change(self, instance, brightness):
+        """Обрабатывает изменения значений ползунков"""
+        global r, g, b
+        if self.color == 'red':
+            r = self.value
+
+        if self.color == 'green':
+            g = self.value
+
+        if self.color == 'blue':
+            b = self.value
+
+        with app.draw_screen.main_layout.layout.col.canvas:
+            Color(r / 256, g / 256, b / 256, 0.1)
+            Rectangle(pos=app.draw_screen.main_layout.layout.col.pos, size=app.draw_screen.main_layout.layout.col.size)
+
+
+class Drawcanvas(Widget):
+    """Холст для рисунков"""
+
+    def on_touch_down(self, touch):
+        if touch.y < 105: return
+        with self.canvas:
+            Color(r / 256, g / 256, b / 256, 1)
+            Ellipse(pos=(touch.x - RAD / 2, touch.y - RAD / 2), size=(RAD, RAD))
+            touch.ud['line'] = Line(points=(touch.x, touch.y), width=RAD / 2)
+
+    def on_touch_move(self, touch):
+        if touch.y < 105: return
+        try:
+            touch.ud['line'].points += touch.x, touch.y
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':
