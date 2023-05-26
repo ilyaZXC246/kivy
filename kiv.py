@@ -166,6 +166,7 @@ class ImageScreen(Screen):
         self.main_layout.back_btn = NavButton(nav='main_screen', clear=True, text='Назад', size_hint=(None, None), width='100sp', height='100sp')
 
         self.main_layout.back_btn.pos_hint = {'right': 1}
+        self.main_layout.image.pos_hint = {'center_x': 0.5}
         self.main_layout.image.on_touch_down = self.change_image
 
         self.main_layout.add_widget(self.main_layout.image)
