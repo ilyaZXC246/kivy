@@ -10,13 +10,14 @@ from kivy.uix.slider import Slider
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
+from kivy.uix.image import Image
 from random import randint as rand
 
 
-PASSWORD = '1'
+PASSWORD = 'костя немощный'
 RAD = 20
 r, g, b = 0, 0, 0
-
+POOP = r'poop.png'
 
 class Applick(App):
     """ГЛАВНЫЙ КЛАСС"""
@@ -152,6 +153,13 @@ class ProtectedScreen(Screen):
         self.add_widget(self.main_layout)
 
 
+class ImageScreen(Screen):
+    """Экран с картинкой"""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.maim_layout = BoxLayout(orientation='')
 class NavButton(Button):
     """Навигационные кнопки"""
 
