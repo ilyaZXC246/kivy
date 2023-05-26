@@ -14,10 +14,12 @@ from kivy.uix.image import Image
 from random import randint as rand
 
 
-PASSWORD = 'костя немощный'
+PASSWORD = '1'
 RAD = 20
 r, g, b = 0, 0, 0
 POOP = r'poop.png'
+SCRIM = r'scrim.png'
+
 
 class Applick(App):
     """ГЛАВНЫЙ КЛАСС"""
@@ -31,14 +33,14 @@ class Applick(App):
         self.main_screen = MainScreen(name='main_screen')
         self.draw_screen = DrawScreen(name='draw_screen')
         self.points_screen = PointsScreen(name='points_screen')
-        # self.right_screen = ChildScreen(name='right_screen', text='правый экран')
+        self.image_screen = ImageScreen(name='image_screen')
         # self.down_screen = ChildScreen(name='down_screen', text='нижний экран')
         self.protected_screen = ProtectedScreen(name='protected_screen')
 
         self.sm.add_widget(self.main_screen)
         self.sm.add_widget(self.draw_screen)
         self.sm.add_widget(self.points_screen)
-        # self.sm.add_widget(self.right_screen)
+        self.sm.add_widget(self.image_screen)
         # self.sm.add_widget(self.down_screen)
         self.sm.add_widget(self.protected_screen)
 
@@ -55,7 +57,7 @@ class MainScreen(Screen):
         self.main_layout.btn_up = NavButton(nav='points_screen', size_hint=(.35, .5), text='Вверх')
         self.main_layout.layout = BoxLayout(orientation='horizontal', padding=8, spacing=8, size_hint=(1, .5))
         self.main_layout.layout.btn_left = NavButton(nav='draw_screen', text='Влево')
-        self.main_layout.layout.btn_right = NavButton(nav='right_screen', text='Вправо')
+        self.main_layout.layout.btn_right = NavButton(nav='image_screen', text='Вправо')
         self.main_layout.layout.text = Label(text='Выбери')
         self.main_layout.btn_down = NavButton(nav='down_screen', size_hint=(.35, .5), text='Вниз')
 
@@ -159,7 +161,26 @@ class ImageScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.maim_layout = BoxLayout(orientation='')
+        self.main_layout = BoxLayout(orientation='vertical')
+        self.main_layout.image = Image(source=POOP, size_hint=(None, None), width=100, height=100)
+        self.main_layout.back_btn = NavButton(nav='main_screen', clear=True, text='Назад', size_hint=(None, None), width='100sp', height='100sp')
+
+        self.main_layout.back_btn.pos_hint = {'right': 1}
+        self.main_layout.image.on_touch_down = self.change_image
+
+        self.main_layout.add_widget(self.main_layout.image)
+        self.main_layout.add_widget(self.main_layout.back_btn)
+
+        self.add_widget(self.main_layout)
+
+    def change_image(self, touch):
+        if self.main_layout.image.width > 400:
+            self.main_layout.image.source = SCRIM
+            return
+        self.main_layout.image.width += 10
+        self.main_layout.image.height += 10
+
+
 class NavButton(Button):
     """Навигационные кнопки"""
 
@@ -176,15 +197,21 @@ class NavButton(Button):
         global r, g, b
         if self.clear:
 
-            self.canv.canvas.clear()
+            if self.canv is not None:
+                self.canv.canvas.clear()
             app.points_screen.main_layout.layout.count.text = '0'
             app.draw_screen.main_layout.layout.color_layout.red_slider.value = 0
             app.draw_screen.main_layout.layout.color_layout.green_slider.value = 0
             app.draw_screen.main_layout.layout.color_layout.blue_slider.value = 0
             r, g, b = 0, 0, 0
+
             with app.draw_screen.main_layout.layout.col.canvas:
                 Color(0, 0, 0, 1)
                 Rectangle(pos=app.draw_screen.main_layout.layout.col.pos, size=app.draw_screen.main_layout.layout.col.size)
+
+            app.image_screen.main_layout.image.width = 100
+            app.image_screen.main_layout.image.height = 100
+            app.image_screen.main_layout.image.source = POOP
 
         if self.nav == 'points_screen':
             app.position = 'up'
@@ -201,7 +228,7 @@ class NavButton(Button):
             app.main_screen.manager.transition.direction = 'right'
             app.main_screen.manager.current = 'protected_screen'
 
-        if self.nav == 'right_screen':
+        if self.nav == 'image_screen':
             app.position = 'right'
             app.main_screen.manager.transition.direction = 'left'
             app.main_screen.manager.current = 'protected_screen'
@@ -227,7 +254,7 @@ class NavButton(Button):
                     app.main_screen.manager.current = 'draw_screen'
 
                 elif app.position == 'right':
-                    pass
+                    app.main_screen.manager.current = 'image_screen'
 
             else:
                 app.protected_screen.main_layout.txt.text = 'Неверный пароль'
