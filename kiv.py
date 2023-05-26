@@ -175,6 +175,8 @@ class ImageScreen(Screen):
         self.add_widget(self.main_layout)
 
     def change_image(self, touch):
+        """Изменяет размеры изображения"""
+
         if self.main_layout.image.width > 400:
             self.main_layout.image.source = SCRIM
             return
