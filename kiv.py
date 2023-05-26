@@ -97,7 +97,7 @@ class PointsScreen(Screen):
 
 
 class DrawScreen(Screen):
-    """Рисовашкка"""
+    """Экран для рисования"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -121,6 +121,7 @@ class DrawScreen(Screen):
         self.main_layout.layout.add_widget(self.main_layout.layout.col)
         self.main_layout.layout.add_widget(self.main_layout.layout.reset_btn)
         self.main_layout.layout.add_widget(self.main_layout.layout.back_btn)
+
         self.add_widget(self.main_layout)
 
 
@@ -246,7 +247,7 @@ class PlusButton(Button):
 
 
 class ResetButton(Button):
-    """очищает холст"""
+    """Кнопка очищает холст"""
 
     def __init__(self, canv, **kwargs):
         super().__init__(**kwargs)
