@@ -21,8 +21,8 @@ POOP = r'poop.png'
 SCRIM = r'scrim.png'
 FON = r'fon.png'
 PRISON = r'prison.png'
-r, g, b = 0, 0, 0
 FACES = [r'1face.png', r'2face.png', r'3face.png', r'4face.png']
+r, g, b = 0, 0, 0
 
 
 class Applick(App):
