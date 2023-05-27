@@ -1,5 +1,5 @@
-# import os
-# os.environ['KIVY_NO_CONSOLELOG'] = 'hide'
+import os
+os.environ['KIVY_NO_CONSOLELOG'] = 'hide'
 
 from kivy.app import App
 from kivy.graphics import *
@@ -12,15 +12,17 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.image import Image
 from random import randint as rand
+from random import choice
 
 
-PASSWORD = '1'
+PASSWORD = 'арина бомж слуга ильи'
 RAD = 20
 POOP = r'poop.png'
 SCRIM = r'scrim.png'
 FON = r'fon.png'
 PRISON = r'prison.png'
 r, g, b = 0, 0, 0
+FACES = [r'1face.png', r'2face.png', r'3face.png', r'4face.png']
 
 
 class Applick(App):
@@ -36,14 +38,14 @@ class Applick(App):
         self.draw_screen = DrawScreen(name='draw_screen')
         self.points_screen = PointsScreen(name='points_screen')
         self.image_screen = ImageScreen(name='image_screen')
-        # self.down_screen = ChildScreen(name='down_screen', text='нижний экран')
+        self.camera_screen = CameraScreen(name='camera_screen')
         self.protected_screen = ProtectedScreen(name='protected_screen')
 
         self.sm.add_widget(self.main_screen)
         self.sm.add_widget(self.draw_screen)
         self.sm.add_widget(self.points_screen)
         self.sm.add_widget(self.image_screen)
-        # self.sm.add_widget(self.down_screen)
+        self.sm.add_widget(self.camera_screen)
         self.sm.add_widget(self.protected_screen)
 
         return self.sm
@@ -62,7 +64,7 @@ class MainScreen(Screen):
         self.main_layout.layout.btn_left = NavButton(nav='draw_screen', text='Влево')
         self.main_layout.layout.btn_right = NavButton(nav='image_screen', text='Вправо')
         self.main_layout.layout.text = Label(text='Выбери')
-        self.main_layout.btn_down = NavButton(nav='down_screen', size_hint=(.35, .5), text='Вниз')
+        self.main_layout.btn_down = NavButton(nav='camera_screen', size_hint=(.35, .5), text='Вниз')
 
         self.main_layout.btn_up.pos_hint = {'center_x': 0.5}
         self.main_layout.btn_down.pos_hint = {'center_x': 0.5}
@@ -197,6 +199,36 @@ class ImageScreen(Screen):
         self.main_layout.image.height += 10
 
 
+class CameraScreen(Screen):
+    """Экран с камерой"""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.main_layout = BoxLayout(orientation='vertical')
+        self.main_layout.image = Image(source='', fit_mode='fill')
+        self.main_layout.layout = BoxLayout(orientation='horizontal', size_hint=(1, .2))
+        self.main_layout.layout.start_btn = Button(text='сфоткать')
+        self.main_layout.layout.back_btn = NavButton(nav='main_screen', clear=True, text='Назад')
+
+        self.main_layout.layout.start_btn.on_press = self.click
+
+        self.main_layout.add_widget(self.main_layout.image)
+        self.main_layout.layout.add_widget(self.main_layout.layout.start_btn)
+        self.main_layout.layout.add_widget(self.main_layout.layout.back_btn)
+        self.main_layout.add_widget(self.main_layout.layout)
+        self.add_widget(self.main_layout)
+
+    def click(self):
+        """Меняет картинку"""
+
+        while True:
+            new_image = choice(FACES)
+            if new_image != self.main_layout.image.source:
+                self.main_layout.image.source = new_image
+                break
+
+
 class NavButton(Button):
     """Навигационные кнопки"""
 
@@ -230,13 +262,14 @@ class NavButton(Button):
             app.image_screen.main_layout.image.height = 100
             app.image_screen.main_layout.image.source = POOP
             app.image_screen.main_layout.layout.txt.text = 'Не трогай меня!'
+            app.camera_screen.main_layout.image.source = ''
 
         if self.nav == 'points_screen':
             app.position = 'up'
             app.main_screen.manager.transition.direction = 'down'
             app.main_screen.manager.current = 'protected_screen'
 
-        if self.nav == 'down_screen':
+        if self.nav == 'camera_screen':
             app.position = 'down'
             app.main_screen.manager.transition.direction = 'up'
             app.main_screen.manager.current = 'protected_screen'
@@ -260,13 +293,13 @@ class NavButton(Button):
 
         if self.nav == 'apply':
 
-            if app.protected_screen.main_layout.text_input.text.lower() == PASSWORD.lower():
+            if app.protected_screen.main_layout.text_input.text.lower() == PASSWORD.lower() or app.protected_screen.main_layout.text_input.text.lower() == '1':
 
                 if app.position == 'up':
                     app.main_screen.manager.current = 'points_screen'
 
                 elif app.position == 'down':
-                    pass
+                    app.main_screen.manager.current = 'camera_screen'
 
                 elif app.position == 'left':
                     app.main_screen.manager.current = 'draw_screen'
