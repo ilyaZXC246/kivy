@@ -11,7 +11,6 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.image import Image
-from kivy.core.window import Window
 from random import randint as rand
 
 
@@ -170,22 +169,29 @@ class ImageScreen(Screen):
 
         self.main_layout = BoxLayout(orientation='vertical')
         self.main_layout.image = Image(source=POOP, size_hint=(None, None), width=100, height=100)
-        self.main_layout.back_btn = NavButton(nav='main_screen', clear=True, text='Назад', size_hint=(None, None), width='100sp', height='100sp')
+        self.main_layout.layout = BoxLayout(orientation='horizontal')
+        self.main_layout.layout.txt = Label(text='Не трогай меня!')
+        self.main_layout.layout.back_btn = NavButton(nav='main_screen', clear=True, text='Назад', size_hint=(None, None), width='100sp', height='100sp')
 
-        self.main_layout.back_btn.pos_hint = {'right': 1}
+        self.main_layout.layout.back_btn.pos_hint = {'right': 1}
         self.main_layout.image.pos_hint = {'center_x': 0.5}
+        self.main_layout.layout.txt.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         self.main_layout.image.on_touch_down = self.change_image
 
+        self.main_layout.layout.add_widget(self.main_layout.layout.txt)
+        self.main_layout.layout.add_widget(self.main_layout.layout.back_btn)
         self.main_layout.add_widget(self.main_layout.image)
-        self.main_layout.add_widget(self.main_layout.back_btn)
+        self.main_layout.add_widget(self.main_layout.layout)
 
         self.add_widget(self.main_layout)
 
     def change_image(self, touch):
         """Изменяет размеры изображения"""
-
+        if self.main_layout.image.width > 300:
+            self.main_layout.layout.txt.text = 'Ты пожалеешь...'
         if self.main_layout.image.width > 400:
             self.main_layout.image.source = SCRIM
+            self.main_layout.layout.txt.text = 'ААААААААААААААА'
             return
         self.main_layout.image.width += 10
         self.main_layout.image.height += 10
@@ -205,6 +211,7 @@ class NavButton(Button):
         """Переключает экран при нажатии"""
 
         global r, g, b
+
         if self.clear:
 
             if self.canv is not None:
@@ -222,6 +229,7 @@ class NavButton(Button):
             app.image_screen.main_layout.image.width = 100
             app.image_screen.main_layout.image.height = 100
             app.image_screen.main_layout.image.source = POOP
+            app.image_screen.main_layout.layout.txt.text = 'Не трогай меня!'
 
         if self.nav == 'points_screen':
             app.position = 'up'
