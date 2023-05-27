@@ -11,14 +11,17 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.image import Image
+from kivy.core.window import Window
 from random import randint as rand
 
 
 PASSWORD = '1'
 RAD = 20
-r, g, b = 0, 0, 0
 POOP = r'poop.png'
 SCRIM = r'scrim.png'
+FON = r'fon.png'
+PRISON = r'prison.png'
+r, g, b = 0, 0, 0
 
 
 class Applick(App):
@@ -53,6 +56,7 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.fon_image = Image(source=FON, fit_mode='fill')
         self.main_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
         self.main_layout.btn_up = NavButton(nav='points_screen', size_hint=(.35, .5), text='Вверх')
         self.main_layout.layout = BoxLayout(orientation='horizontal', padding=8, spacing=8, size_hint=(1, .5))
@@ -64,6 +68,7 @@ class MainScreen(Screen):
         self.main_layout.btn_up.pos_hint = {'center_x': 0.5}
         self.main_layout.btn_down.pos_hint = {'center_x': 0.5}
 
+        self.add_widget(self.fon_image)
         self.main_layout.add_widget(self.main_layout.btn_up)
         self.main_layout.layout.add_widget(self.main_layout.layout.btn_left)
         self.main_layout.layout.add_widget(self.main_layout.layout.text)
@@ -134,6 +139,7 @@ class ProtectedScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.fon_image = Image(source=PRISON, fit_mode='fill')
         self.main_layout = BoxLayout(orientation='vertical')
         self.main_layout.txt = Label(text='Введите пароль')
         self.main_layout.text_input = TextInput(size_hint=(.5, .1), halign='left', multiline=False)
@@ -146,6 +152,7 @@ class ProtectedScreen(Screen):
         self.main_layout.layout.apply.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         self.main_layout.layout.back.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
 
+        self.add_widget(self.fon_image)
         self.main_layout.add_widget(self.main_layout.txt)
         self.main_layout.add_widget(self.main_layout.text_input)
         self.main_layout.layout.add_widget(self.main_layout.layout.apply)
