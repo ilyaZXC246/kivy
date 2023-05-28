@@ -1,6 +1,3 @@
-import os
-os.environ['KIVY_NO_CONSOLELOG'] = 'hide'
-
 from kivy.app import App
 from kivy.graphics import *
 from kivy.uix.boxlayout import BoxLayout
