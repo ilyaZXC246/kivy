@@ -109,7 +109,7 @@ class DrawScreen(Screen):
         super().__init__(**kwargs)
         self.main_layout = BoxLayout(orientation='vertical')
         self.main_layout.can = Drawcanvas()
-        self.main_layout.layout = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        self.main_layout.layout = BoxLayout(orientation='horizontal', size_hint=(1, .4))
         self.main_layout.layout.color_layout = BoxLayout(orientation='vertical')
         self.main_layout.layout.color_layout.red_slider = ColorSlider(color='red', min=0, max=255, value_track=True, value_track_color=[1, 0, 0, 1])
         self.main_layout.layout.color_layout.green_slider = ColorSlider(color='green', min=0, max=255, value_track=True, value_track_color=[0, 1, 0, 1])
@@ -139,13 +139,13 @@ class ProtectedScreen(Screen):
 
         self.fon_image = Image(source=PRISON, fit_mode='fill')
         self.main_layout = BoxLayout(orientation='vertical')
-        self.main_layout.txt = Label(text='Введите пароль')
+        self.main_layout.txt = Label(text='Введите пароль', size_hint=(1, .5))
         self.main_layout.text_input = TextInput(size_hint=(.5, .1), halign='left', multiline=False)
-        self.main_layout.layout = BoxLayout(orientation='horizontal', size_hint=(.5, .5))
+        self.main_layout.layout = BoxLayout(orientation='horizontal', size_hint=(.5, .5), padding=20, spacing=20)
         self.main_layout.layout.apply = NavButton(nav='apply', text='ОК!', size_hint=(.8, .5))
         self.main_layout.layout.back = NavButton(nav='main_screen', text='назад', size_hint=(.8, .5))
 
-        self.main_layout.text_input.pos_hint = {'center_x': 0.5}
+        self.main_layout.text_input.pos_hint = {'center_x': 0.5, 'center_y': 1}
         self.main_layout.layout.pos_hint = {'center_x': 0.5}
         self.main_layout.layout.apply.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
         self.main_layout.layout.back.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
@@ -186,14 +186,14 @@ class ImageScreen(Screen):
 
     def change_image(self, touch):
         """Изменяет размеры изображения"""
-        if self.main_layout.image.width > 300:
+        if self.main_layout.image.width > 600:
             self.main_layout.layout.txt.text = 'Ты пожалеешь...'
-        if self.main_layout.image.width > 400:
+        if self.main_layout.image.width > 1200:
             self.main_layout.image.source = SCRIM
             self.main_layout.layout.txt.text = 'ААААААААААААААА'
             return
-        self.main_layout.image.width += 10
-        self.main_layout.image.height += 10
+        self.main_layout.image.width += 50
+        self.main_layout.image.height += 50
 
 
 class CameraScreen(Screen):
@@ -326,7 +326,7 @@ class PlusButton(Button):
             for i in range(self.pl):
                 R, G, B, A = rand(0, 255) / 256, rand(0, 255) / 256, rand(0, 255) / 256, 1
                 Color(R, G, B, A)
-                Rectangle(pos=(rand(0, 600), rand(0, 600)), size=(10, 10))
+                Rectangle(pos=(rand(0, 1080), rand(0, 1920)), size=(10, 10))
 
 
 class ResetButton(Button):
@@ -383,14 +383,14 @@ class Drawcanvas(Widget):
     """Холст для рисунков"""
 
     def on_touch_down(self, touch):
-        if touch.y < 105: return
+        if touch.y < 480: return
         with self.canvas:
             Color(r / 256, g / 256, b / 256, 1)
             Ellipse(pos=(touch.x - RAD / 2, touch.y - RAD / 2), size=(RAD, RAD))
             touch.ud['line'] = Line(points=(touch.x, touch.y), width=RAD / 2)
 
     def on_touch_move(self, touch):
-        if touch.y < 105: return
+        if touch.y < 480: return
         try:
             touch.ud['line'].points += touch.x, touch.y
         except Exception:
